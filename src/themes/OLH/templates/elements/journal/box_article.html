@@ -16,7 +16,7 @@
             {% elif request.journal.thumbnail_image %}
                 <img src="{% url 'journal_cover_download' %}" class="article-thumbnail">
             {% else %}
-            <img src="{% static 'common/img/icons/article.png' %}" alt="{{ article.title|striptags|escape }}"
+            <img src="{% static 'common/img/icons/view.png' %}" alt="{{ article.title|striptags|escape }}"
                  class="article-thumbnail"> {% endif %}
         </div>
         {% endif %}

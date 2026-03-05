@@ -12,8 +12,6 @@ services:
       - "POSTGRES_PASSWORD=${DB_PASSWORD}"
       - "POSTGRES_USER=${DB_USER}"
       - "POSTGRES_DB=${DB_NAME}"
-    depends_on:
-      - janeway-pgadmin
 
   janeway-pgadmin:
     image: dpage/pgadmin4
@@ -31,36 +29,12 @@ services:
             - PGADMIN_CONFIG_SERVER_MODE=False
             - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
 
-  janeway-mysql:
-    image: mysql:8.3
-    volumes:
-      - ./db/mysql-data:/var/lib/mysql
-    ports:
-      - "${DB_PORT}"
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - "MYSQL_PASSWORD=${DB_PASSWORD}"
-      - "MYSQL_USER=${DB_USER}"
-      - "MYSQL_DATABASE=${DB_NAME}"
-
-  janeway-mariadb:
-    image: mariadb/server:10.2.22
-    volumes:
-      - ./db/mariadb-data:/var/lib/mysql
-    ports:
-      - "${DB_PORT}"
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - "MYSQL_PASSWORD=${DB_PASSWORD}"
-      - "MYSQL_USER=${DB_USER}"
-      - "MYSQL_DATABASE=${DB_NAME}"
-
   start_dependencies:
     image: dadarek/wait-for-dependencies
     depends_on:
-     - "janeway-${DB_VENDOR}"
+     - "janeway-postgres"
      - janeway-debug-smtp
-    command: "janeway-${DB_VENDOR}:${DB_PORT}"
+    command: "janeway-postgres:${DB_PORT}"
 
   janeway-web:
     build:
@@ -73,6 +47,7 @@ services:
       - ./db/janeway.sqlite3:/db/janeway.sqlite3
     ports:
       - "${JANEWAY_PORT}:8000"
+    command: runserver 0.0.0.0:8000 --noreload
     environment:
       - DB_VENDOR
       - DB_HOST
@@ -93,13 +68,6 @@ services:
     cap_add:
       - SYS_PTRACE
 
-  janeway-sqlite:
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile
-    command: /bin/bash
-    volumes:
-      - ./db/janeway.sqlite:/var/lib/janeway.sqlite
   janeway-debug-smtp:
     # Use same python as janeway-web to reduce the number of images
     image: python:3.8

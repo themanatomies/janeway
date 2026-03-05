@@ -7,13 +7,17 @@ FORCE_BUILTIN_XSL = False
 SECRET_KEY = "uxprsdhk^gzd-r=_287byolxn)$k6tsd8_cepl^s^tms2w1qrv"
 
 # This is the default redirect if no other sites are found.
-DEFAULT_HOST = "https://www.example.org"
+DEFAULT_HOST = "http://localhost:8000"
 EMAIL_BACKEND = (
     os.environ.get(
         "JANEWAY_EMAIL_BACKEND",
     )
-    or "django.core.mail.backends.console.EmailBackend"
+    or "django.core.mail.backends.smtp.EmailBackend"
 )
+EMAIL_HOST = os.environ.get("JANEWAY_EMAIL_HOST", "janeway-debug-smtp")
+EMAIL_PORT = int(os.environ.get("JANEWAY_EMAIL_PORT") or 1025)
+EMAIL_USE_TLS = os.environ.get("JANEWAY_EMAIL_USE_TLS", False)
+DEFAULT_FROM_EMAIL = "noreply@janeway.local"
 
 URL_CONFIG = "path"  # path or domain
 

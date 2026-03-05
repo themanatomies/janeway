@@ -1741,9 +1741,12 @@ class Article(AbstractLastModifiedModel):
             # TODO: handle better and log
             return None
 
-    @property
-    @cache(600)
+    @cached_property
     def url(self):
+        # For path-based URL routing, use local_url directly.
+        # The journal code is resolved by middleware, not included in the URL pattern.
+        if settings.URL_CONFIG == "path":
+            return settings.DEFAULT_HOST.rstrip('/') + self.local_url
         return self.journal.site_url(path=self.local_url)
 
     @property
@@ -1777,6 +1780,9 @@ class Article(AbstractLastModifiedModel):
             "article_download_galley",
             kwargs={"article_id": self.pk, "galley_id": pdfs[0].pk},
         )
+        # For path-based URL routing, don't add the journal code prefix
+        if settings.URL_CONFIG == "path":
+            return settings.DEFAULT_HOST.rstrip('/') + path
         return self.journal.site_url(path=path)
 
     def get_remote_url(self, request):

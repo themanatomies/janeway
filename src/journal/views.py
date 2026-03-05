@@ -648,12 +648,12 @@ def download_galley(request, article_id, galley_id):
         submission_models.Article,
         pk=article_id,
         journal=request.journal,
-        date_published__lte=timezone.now(),
         stage__in=submission_models.PUBLISHED_STAGES,
     )
     galley = get_object_or_404(
         core_models.Galley,
         pk=galley_id,
+        article=article,
         public=True,
     )
 
@@ -681,7 +681,6 @@ def view_galley(request, article_id, galley_id):
         submission_models.Article,
         pk=article_id,
         journal=request.journal,
-        date_published__lte=timezone.now(),
         stage__in=submission_models.PUBLISHED_STAGES,
     )
     galley = get_object_or_404(
