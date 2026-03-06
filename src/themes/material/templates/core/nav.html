@@ -28,6 +28,7 @@
             <span class="sr-only">{% trans 'Open navigation menu' %}</span>
         </a>
         <ul class="right hide-on-med-and-down">
+            <li><a href="/" title="{% trans 'Return to press home' %}">← {{ request.press.name }}</a></li>
             {% if request.journal.nav_home %}
             <li><a href="{% url 'website_index' %}">{% trans "Home" %}</a></li>
             {% endif %}
@@ -101,6 +102,7 @@
         </ul>
 
         <ul class="sidenav" id="nav-mobile">
+            <li><a href="/" title="{% trans 'Return to press home' %}">← {{ request.press.name }}</a></li>
             {% if request.journal.nav_home %}
             <li><a href="{% url 'website_index' %}">{% trans "Home" %}</a></li>
             {% endif %}

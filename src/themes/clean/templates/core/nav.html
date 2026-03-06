@@ -13,6 +13,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav font-weight-bold d-flex w-100">
+            <li class="nav-item"><a href="/" class="nav-link" title="{% trans 'Return to press home' %}">← {{ request.press.name }}</a></li>
             {% if request.journal.nav_home %}
             <li class="nav-item"><a href="{% url 'website_index' %}" class="nav-link">{% trans 'Home' %}</a></li>{% endif %}
             {% if request.journal.nav_news %}

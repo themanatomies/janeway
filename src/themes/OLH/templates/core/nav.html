@@ -6,6 +6,11 @@
 <nav>
     <div class="top-bar" id="main-menu" style="display: block;">
         <ul class="menu vertical medium-horizontal" data-responsive-menu="drilldown medium-dropdown">
+            <li>
+                <a href="/" title="{% trans 'Return to press home' %}">
+                    ← {{ request.press.name }}
+                </a>
+            </li>
             {% if request.journal.nav_home %}
                 <li>
                     <a href="{% url 'website_index' %}">{% trans 'Home' %}</a>
