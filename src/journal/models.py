@@ -427,6 +427,16 @@ class Journal(AbstractSiteModel):
     @classmethod
     def get_by_request(cls, request):
         obj, path = super().get_by_request(request)
+        
+        # Don't match journal by domain for press-only paths
+        press_only_paths = ['/journals/', '/news/', '/site/', '/login/', '/register/', '/manager/', '/submit/']
+        request_path = request.path
+        if obj and any(request_path.startswith(p) for p in press_only_paths):
+            # This is a press-level request, not a journal-specific one
+            # Don't return the journal match
+            obj = None
+            path = None
+        
         if not obj:
             # Lookup by code
             try:
