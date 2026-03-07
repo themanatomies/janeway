@@ -1689,6 +1689,27 @@ def setup_journal_file_directory(sender, instance, created, **kwargs):
         instance.setup_directory()
 
 
+@receiver(post_save, sender=Journal)
+def setup_default_issue_types(sender, instance, created, **kwargs):
+    if created:
+        # Create default "issue" IssueType
+        IssueType.objects.get_or_create(
+            journal=instance,
+            code="issue",
+            defaults={
+                "pretty_name": "Issue",
+            }
+        )
+        # Create default "collection" IssueType
+        IssueType.objects.get_or_create(
+            journal=instance,
+            code="collection",
+            defaults={
+                "pretty_name": "Collection",
+            }
+        )
+
+
 def issue_articles_change(sender, **kwargs):
     """
     When an article is removed from an issue this signal will delete any
