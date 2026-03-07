@@ -264,6 +264,14 @@ class Journal(AbstractSiteModel):
         on_delete=models.SET_DEFAULT,
         related_name="default_xsl",
     )
+    press_association = models.ForeignKey(
+        "press.Press",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="journals_list",
+        help_text=gettext("The press this journal belongs to."),
+    )
 
     # Boolean to determine if this journal should be hidden from the press
     hide_from_press = models.BooleanField(default=False)
@@ -421,8 +429,10 @@ class Journal(AbstractSiteModel):
 
     @property
     def press(self):
-        press = press_models.Press.objects.all().first()
-        return press
+        """Backward compatibility property that returns the associated press."""
+        return self.press_association
+
+    # Note: press_association is the ForeignKey field that associates the journal with a press
 
     @classmethod
     def get_by_request(cls, request):

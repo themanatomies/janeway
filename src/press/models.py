@@ -454,9 +454,12 @@ class Press(AbstractSiteModel):
     @property
     def public_journals(self):
         Journal = apps.get_model("journal.Journal")
+        # In path-based routing, use the press ForeignKey relationship
+        # In domain-based routing, journals may be matched by domain or by press FK
         return Journal.objects.filter(
             hide_from_press=False,
             is_conference=False,
+            press_association=self,
         ).order_by("sequence")
 
     @property
