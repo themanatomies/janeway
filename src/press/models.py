@@ -204,7 +204,7 @@ class Press(AbstractSiteModel):
     @staticmethod
     def get_press(request):
         try:
-            p = Press.objects.all()[:1].get()
+            p, path = Press.get_by_request(request)
             return p
         except BaseException:
             return None

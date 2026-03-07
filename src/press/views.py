@@ -257,7 +257,7 @@ def serve_press_cover(request):
     """
     p = press_models.Press.get_press(request)
 
-    if p.thumbnail_image:
+    if p and p.thumbnail_image:
         return files.serve_press_cover(request, p.thumbnail_image)
     else:
         raise Http404
