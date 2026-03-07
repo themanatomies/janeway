@@ -466,8 +466,17 @@ class Journal(AbstractSiteModel):
                 path=path,
                 query=query,
             )
-        else:
+        elif self.press:
             return self.press.site_path_url(self, path, query=query)
+        else:
+            # Fallback: return domain-based URL if no press association
+            return logic.build_url(
+                netloc=self.domain or "localhost",
+                scheme=self._get_scheme(),
+                port=None,
+                path=path or f"/{self.code}/",
+                query=query,
+            )
 
     def next_issue_order(self):
         issue_orders = [issue.order for issue in Issue.objects.filter(journal=self)]
