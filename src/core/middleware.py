@@ -95,6 +95,8 @@ class SiteSettingsMiddleware(BaseMiddleware):
         if journal is not None:
             logger.set_prefix(journal.code)
             request.journal = journal
+            # Store journal_id in session for manager URL fallback
+            request.session['current_journal_id'] = journal.id
             request.journal_cover = (
                 journal.press_image_override.path
                 if journal.press_image_override
