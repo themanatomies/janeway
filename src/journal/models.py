@@ -456,15 +456,6 @@ class Journal(AbstractSiteModel):
             except (IndexError, cls.DoesNotExist):
                 pass
         
-        # Session-based fallback for manager URLs and other path-less contexts
-        if not obj and hasattr(request, 'session'):
-            journal_id = request.session.get('current_journal_id')
-            if journal_id:
-                try:
-                    obj = cls.objects.get(id=journal_id)
-                except cls.DoesNotExist:
-                    pass
-        
         return obj, path
 
     def site_url(self, path="", query=""):
