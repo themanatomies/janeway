@@ -167,6 +167,7 @@ def manager_index(request):
             if form.is_valid():
                 new_journal = form.save()
                 new_journal.sequence = request.press.next_journal_order()
+                new_journal.press_association = request.press
                 new_journal.save()
                 call_command("install_plugins")
                 install.update_issue_types(new_journal)
