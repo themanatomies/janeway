@@ -67,9 +67,10 @@ services:
     restart: unless-stopped
     command: >
       sh -c "
-      python src/manage.py migrate &&
-      python src/manage.py collectstatic --noinput &&
-      gunicorn -w 4 -b 0.0.0.0:8000 src.janeway.wsgi:application
+      cd /vol/janeway/src &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn -w 4 -b 0.0.0.0:8000 janeway.wsgi:application
       "
 
   nginx:
