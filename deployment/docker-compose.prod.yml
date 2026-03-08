@@ -43,6 +43,7 @@ services:
     container_name: janeway-web
     environment:
       DEBUG: "False"
+      JANEWAY_SETTINGS_MODULE: "core.janeway_global_settings"
       ALLOWED_HOSTS: "${ALLOWED_HOSTS}"
       SECRET_KEY: "${SECRET_KEY}"
       DB_VENDOR: "postgres"
