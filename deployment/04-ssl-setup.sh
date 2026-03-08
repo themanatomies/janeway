@@ -40,6 +40,9 @@ sudo mkdir -p /vol/janeway/nginx/ssl
 sudo mkdir -p /var/www/certbot
 sudo chown -R $USER:$USER /vol/janeway/nginx/ssl
 
+echo "Temporarily stopping Nginx to allow Certbot to use port 80..."
+docker compose -f deployment/docker-compose.prod.yml stop janeway-nginx
+
 echo "Creating Certbot container..."
 docker run --rm \
   -v /vol/janeway/nginx/ssl:/etc/letsencrypt \
@@ -53,6 +56,9 @@ docker run --rm \
   -d press.djourns.com \
   -d anotherpress.djourns.com
 
+echo "Restarting Nginx..."
+docker compose -f deployment/docker-compose.prod.yml start janeway-nginx
+
 echo ""
 echo "Copying certificates to Nginx..."
 sudo mkdir -p /vol/janeway/nginx/ssl/press.djourns.com
@@ -63,8 +69,7 @@ sudo cp /vol/janeway/nginx/ssl/live/press.djourns.com/privkey.pem /vol/janeway/n
 sudo cp /vol/janeway/nginx/ssl/live/anotherpress.djourns.com/fullchain.pem /vol/janeway/nginx/ssl/anotherpress.djourns.com/
 sudo cp /vol/janeway/nginx/ssl/live/anotherpress.djourns.com/privkey.pem /vol/janeway/nginx/ssl/anotherpress.djourns.com/
 
-echo "Reloading Nginx..."
-docker compose -f deployment/docker-compose.prod.yml exec -T nginx nginx -s reload
+sleep 5
 
 echo ""
 echo "=== SSL Setup Complete ==="
