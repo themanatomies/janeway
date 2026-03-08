@@ -7,7 +7,7 @@ from django.conf import settings
 
 from utils import load_janeway_settings
 
-os.environ.setdefault("JANEWAY_SETTINGS_MODULE", "core.settings")
+os.environ.setdefault("JANEWAY_SETTINGS_MODULE", "core.janeway_global_settings")
 
 if __name__ == "__main__":
     from django.core.management import execute_from_command_line
