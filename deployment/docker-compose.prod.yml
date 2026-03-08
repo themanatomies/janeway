@@ -65,9 +65,11 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    entrypoint: []
     command: >
       sh -c "
       cd /vol/janeway/src &&
+      export PYTHONPATH=/vol/janeway/src:/vol/janeway:$$PYTHONPATH &&
       python manage.py migrate &&
       python manage.py collectstatic --noinput &&
       gunicorn -w 4 -b 0.0.0.0:8000 janeway.wsgi:application
