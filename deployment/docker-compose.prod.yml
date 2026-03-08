@@ -1,0 +1,102 @@
+# deployment/docker-compose.prod.yml
+# Production Docker Compose configuration for Janeway multi-press deployment
+# Usage: docker compose -f docker-compose.prod.yml up
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: janeway-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-janeway}
+      POSTGRES_USER: ${DB_USER:-janeway}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /vol/janeway/db/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-janeway}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: janeway-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  janeway-web:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    container_name: janeway-web
+    environment:
+      DEBUG: "False"
+      ALLOWED_HOSTS: "${ALLOWED_HOSTS}"
+      SECRET_KEY: "${SECRET_KEY}"
+      DATABASE_URL: "postgresql://${DB_USER:-janeway}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-janeway}"
+      REDIS_URL: "redis://redis:6379/0"
+      EMAIL_HOST: "${EMAIL_HOST}"
+      EMAIL_PORT: "${EMAIL_PORT}"
+      EMAIL_HOST_USER: "${EMAIL_HOST_USER}"
+      EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
+      EMAIL_USE_TLS: "${EMAIL_USE_TLS:-True}"
+      DEFAULT_FROM_EMAIL: "${DEFAULT_FROM_EMAIL}"
+      INSTALLED_APPS_LOCAL: "${INSTALLED_APPS_LOCAL}"
+    volumes:
+      - /vol/janeway/src:/vol/janeway/src
+      - /vol/janeway/logs:/vol/janeway/logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    command: >
+      sh -c "
+      python src/manage.py migrate &&
+      python src/manage.py collectstatic --noinput &&
+      gunicorn -w 4 -b 0.0.0.0:8000 src.janeway.wsgi:application
+      "
+
+  nginx:
+    image: nginx:alpine
+    container_name: janeway-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /vol/janeway/nginx/conf.d:/etc/nginx/conf.d
+      - /vol/janeway/nginx/ssl:/etc/nginx/ssl
+      - /vol/janeway/src/static:/usr/share/nginx/html/static:ro
+      - /vol/janeway/src/media:/usr/share/nginx/html/media:ro
+    depends_on:
+      - janeway-web
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: janeway_network
+    driver: bridge
