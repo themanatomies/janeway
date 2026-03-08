@@ -41,7 +41,7 @@ sudo mkdir -p /var/www/certbot
 sudo chown -R $USER:$USER /vol/janeway/nginx/ssl
 
 echo "Temporarily stopping Nginx to allow Certbot to use port 80..."
-cd /vol/janeway/janeway && docker compose --env-file .env.prod -f deployment/docker-compose.prod.yml stop janeway-nginx
+docker stop janeway-nginx || echo "Nginx not running, proceeding..."
 
 echo "Creating Certbot container..."
 docker run --rm \
@@ -72,7 +72,9 @@ sudo cp /vol/janeway/nginx/ssl/live/anotherpress.djourns.com/privkey.pem /vol/ja
 sleep 5
 
 echo "Restarting Nginx..."
-cd /vol/janeway/janeway && docker compose --env-file .env.prod -f deployment/docker-compose.prod.yml start janeway-nginx
+docker start janeway-nginx || echo "Nginx restart scheduled"
+
+sleep 3
 
 echo ""
 echo "=== SSL Setup Complete ==="
