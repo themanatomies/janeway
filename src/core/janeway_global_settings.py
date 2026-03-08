@@ -51,7 +51,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # Application definition
 
 INSTALLED_APPS = [
-    "apps.JanewayAdminConfig",
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.messages",
