@@ -55,7 +55,7 @@ services:
       DEFAULT_FROM_EMAIL: "${DEFAULT_FROM_EMAIL}"
       INSTALLED_APPS_LOCAL: "${INSTALLED_APPS_LOCAL}"
     volumes:
-      - /vol/janeway/src:/vol/janeway/src
+      - /vol/janeway/janeway/src:/vol/janeway/src
       - /vol/janeway/logs:/vol/janeway/logs
     ports:
       - "8000:8000"
@@ -81,8 +81,8 @@ services:
     volumes:
       - /vol/janeway/nginx/conf.d:/etc/nginx/conf.d
       - /vol/janeway/nginx/ssl:/etc/nginx/ssl
-      - /vol/janeway/src/static:/usr/share/nginx/html/static:ro
-      - /vol/janeway/src/media:/usr/share/nginx/html/media:ro
+      - /vol/janeway/janeway/src/static:/usr/share/nginx/html/static:ro
+      - /vol/janeway/janeway/src/media:/usr/share/nginx/html/media:ro
     depends_on:
       - janeway-web
     restart: unless-stopped
