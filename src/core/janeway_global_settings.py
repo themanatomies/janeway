@@ -44,7 +44,7 @@ SECRET_KEY = "uxprsdhk^gzd-r=_287byolxn)$k6tsd8_cepl^s^tms2w1qrv"
 DEBUG = False
 COMMAND = sys.argv[1:]
 IN_TEST_RUNNER = COMMAND[:1] == ["test"]
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["press.djourns.com", "anotherpress.djourns.com", "www.djourns.com", "localhost", "127.0.0.1"]
 
 FILE_UPLOAD_PERMISSIONS = 0o644
 
@@ -482,6 +482,15 @@ ORCID_CLIENT_ID = ""
 
 SESSION_ENGINE = "utils.sessions.janeway_db"
 SESSION_COOKIE_NAME = "JANEWAYSESSID"
+SESSION_COOKIE_SECURE = True  # Only send cookie over HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Don't allow JavaScript access
+CSRF_COOKIE_SECURE = True  # Only send CSRF cookie over HTTPS
+CSRF_COOKIE_HTTPONLY = True  # Don't allow JavaScript access
+CSRF_TRUSTED_ORIGINS = [
+    "https://press.djourns.com",
+    "https://anotherpress.djourns.com",
+    "https://www.djourns.com",
+]
 
 S3_ACCESS_KEY = ""
 S3_SECRET_KEY = ""
