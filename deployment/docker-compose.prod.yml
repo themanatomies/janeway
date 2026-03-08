@@ -38,7 +38,7 @@ services:
 
   janeway-web:
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile
     container_name: janeway-web
     environment:
