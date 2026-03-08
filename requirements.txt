@@ -64,4 +64,5 @@ tqdm==4.66.3
 ua-parser==0.16.1
 # See #3736
 urllib3<2
-user-agents==2.2.0gunicorn==21.2.0
+user-agents==2.2.0
+gunicorn==21.2.0
