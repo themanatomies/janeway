@@ -23,8 +23,11 @@ echo "✓ DNS A records must be pointing to this droplet"
 echo "✓ Nginx must be running"
 echo "✓ Ports 80 and 443 must be accessible"
 echo ""
-echo "Press Enter to continue..."
-read
+# Skip user prompt if running in non-interactive mode
+if [ -t 0 ]; then
+    echo "Press Enter to continue..."
+    read
+fi
 
 # Ensure Nginx is running
 docker ps | grep -q janeway-nginx || {
@@ -38,7 +41,7 @@ sudo mkdir -p /var/www/certbot
 sudo chown -R $USER:$USER /vol/janeway/nginx/ssl
 
 echo "Creating Certbot container..."
-docker run -it --rm \
+docker run --rm \
   -v /vol/janeway/nginx/ssl:/etc/letsencrypt \
   -v /var/www/certbot:/var/www/certbot \
   -p 80:80 -p 443:443 \
