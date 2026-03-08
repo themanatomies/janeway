@@ -70,8 +70,8 @@ services:
     command: >
       sh -c "
       cd /vol/janeway/src &&
-      python -m django migrate &&
-      python -m django collectstatic --noinput &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
       gunicorn -w 4 -b 0.0.0.0:8000 janeway.wsgi:application
       "
 
