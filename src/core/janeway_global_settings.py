@@ -51,7 +51,6 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # Application definition
 
 INSTALLED_APPS = [
-    "modeltranslation",
     "apps.JanewayAdminConfig",
     "django.contrib.auth",
     "django.contrib.sessions",
@@ -60,6 +59,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "django.contrib.postgres",
     "django.contrib.contenttypes",
+    "modeltranslation",
     # Installed Apps
     # Install APP is loaded first to ensure all existing models and migrations
     # relying on installation procedures won't fail
