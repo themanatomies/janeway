@@ -5,9 +5,39 @@ __maintainer__ = "Birkbeck Centre for Technology and Publishing"
 
 from django.contrib import admin
 from django.template.defaultfilters import truncatewords
+from django.conf import settings
+from django import forms
 
 from journal import models
+from press import models as press_models
 from utils import admin_utils
+
+
+class JournalAdminForm(forms.ModelForm):
+    """Custom form for Journal admin that handles path-based routing."""
+    
+    class Meta:
+        model = models.Journal
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If using path-based routing, make press_association required
+        if settings.URL_CONFIG == "path":
+            self.fields['press_association'].required = True
+            self.fields['press_association'].help_text = (
+                "Required for path-based routing. The domain will be set to this press's domain."
+            )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        if settings.URL_CONFIG == "path":
+            press_association = cleaned_data.get('press_association')
+            if not press_association:
+                raise forms.ValidationError(
+                    "Press association is required when using path-based URL routing."
+                )
+        return cleaned_data
 
 
 class IssueAdmin(admin.ModelAdmin):
@@ -98,6 +128,26 @@ class JournalAdmin(admin.ModelAdmin):
         "xsl",
     )
     filter_horizontal = ("keywords",)
+    form = JournalAdminForm
+    
+    def save_model(self, request, obj, form, change):
+        """Override save to handle path-based routing configuration."""
+        # If using path-based routing, set domain to press domain
+        if settings.URL_CONFIG == "path":
+            if obj.press_association:
+                obj.domain = obj.press_association.domain
+        super().save_model(request, obj, form, change)
+        
+        # After saving, ensure the journal is in press_press_featured_journals
+        if obj.press_association:
+            from press.models import Press
+            press_press_featured_journals = Press._meta.get_field(
+                'featured_journals'
+            ).remote_field.through
+            press_press_featured_journals.objects.get_or_create(
+                press_id=obj.press_association.id,
+                journal_id=obj.id
+            )
 
 
 class PinnedArticleAdmin(admin.ModelAdmin):
