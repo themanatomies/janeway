@@ -1733,8 +1733,13 @@ class Galley(AbstractLastModifiedModel):
             "article_download_galley",
             kwargs={"article_id": self.article.pk, "galley_id": self.pk},
         )
-        # For path-based URL routing, don't add the journal code prefix
+        # For path-based URL routing, use the journal's press domain
         if settings.URL_CONFIG == "path":
+            if self.article.journal and self.article.journal.press:
+                # Use the press domain to construct the URL
+                scheme = "https" if self.article.journal.press.is_secure else "http"
+                domain = self.article.journal.press.domain
+                return f"{scheme}://{domain}".rstrip('/') + url
             return settings.DEFAULT_HOST.rstrip('/') + url
         return self.article.journal.site_url(path=url)
 

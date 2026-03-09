@@ -1743,9 +1743,13 @@ class Article(AbstractLastModifiedModel):
 
     @cached_property
     def url(self):
-        # For path-based URL routing, use local_url directly.
-        # The journal code is resolved by middleware, not included in the URL pattern.
+        # For path-based URL routing, use the journal's press domain
         if settings.URL_CONFIG == "path":
+            if self.journal and self.journal.press:
+                # Use the press domain to construct the URL
+                scheme = "https" if self.journal.press.is_secure else "http"
+                domain = self.journal.press.domain
+                return f"{scheme}://{domain}".rstrip('/') + self.local_url
             return settings.DEFAULT_HOST.rstrip('/') + self.local_url
         return self.journal.site_url(path=self.local_url)
 
@@ -1780,8 +1784,13 @@ class Article(AbstractLastModifiedModel):
             "article_download_galley",
             kwargs={"article_id": self.pk, "galley_id": pdfs[0].pk},
         )
-        # For path-based URL routing, don't add the journal code prefix
+        # For path-based URL routing, use the journal's press domain
         if settings.URL_CONFIG == "path":
+            if self.journal and self.journal.press:
+                # Use the press domain to construct the URL
+                scheme = "https" if self.journal.press.is_secure else "http"
+                domain = self.journal.press.domain
+                return f"{scheme}://{domain}".rstrip('/') + path
             return settings.DEFAULT_HOST.rstrip('/') + path
         return self.journal.site_url(path=path)
 
